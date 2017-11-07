@@ -1,0 +1,584 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1348\cocoasubrtf170
+{\fonttbl\f0\fnil\fcharset0 HelveticaNeue;\f1\fnil\fcharset0 Monaco;}
+{\colortbl;\red255\green255\blue255;\red56\green57\blue59;\red38\green38\blue38;\red47\green102\blue178;
+\red83\green85\blue2;\red0\green0\blue117;\red82\green0\blue83;\red16\green121\blue2;\red115\green0\blue2;
+\red11\green84\blue83;\red0\green0\blue83;}
+\margl1440\margr1440\vieww25400\viewh13260\viewkind0
+\deftab720
+\pard\pardeftab720
+
+\f0\fs40 \cf2 \expnd0\expndtw0\kerning0
+Project 1 Starter Guide
+\fs26 \cf3 \expnd0\expndtw0\kerning0
+\
+Hello all!\
+\
+This guide will hopefully prepare you to do project 1. It is not meant to tell you exactly what needs to be accomplished to finish project 1; rather it is a tutorial of sorts to get your feet wet with Solr.\
+\
+Links and background information:\
+\
+If you need to understand how to create a core (something I will reference):\
+\
+\pard\pardeftab720
+{\field{\*\fldinst{HYPERLINK "https://cwiki.apache.org/confluence/display/solr/Running+Solr"}}{\fldrslt \cf4 \expnd0\expndtw0\kerning0
+https://cwiki.apache.org/confluence/display/solr/Running+Solr}}\
+\
+When you want to learn more about indexing:\
+\
+\pard\pardeftab720
+{\field{\*\fldinst{HYPERLINK "https://cwiki.apache.org/confluence/display/solr/Indexing+and+Basic+Data+Operations"}}{\fldrslt \cf4 \expnd0\expndtw0\kerning0
+https://cwiki.apache.org/confluence/display/solr/Indexing+and+Basic+Data+Operations}}\
+\
+When you're ready to learn more about analyzers, tokenizers and filters:\
+\
+\pard\pardeftab720
+{\field{\*\fldinst{HYPERLINK "https://cwiki.apache.org/confluence/display/solr/Understanding+Analyzers,+Tokenizers,+and+Filters"}}{\fldrslt \cf4 \expnd0\expndtw0\kerning0
+https://cwiki.apache.org/confluence/display/solr/Understanding+Analyzers,+Tokenizers,+and+Filters}}\
+\
+When you're ready to start indexing foreign languages:\
+\
+\pard\pardeftab720
+{\field{\*\fldinst{HYPERLINK "https://cwiki.apache.org/confluence/display/solr/Language+Analysis"}}{\fldrslt \cf4 \expnd0\expndtw0\kerning0
+https://cwiki.apache.org/confluence/display/solr/Language+Analysis}}\
+\
+Setup:\
+\
+I assume you're already setup on Koding and have the Solr installation working per the previous upload.\
+\
+From here we'll do a few things. We will be creating an example core which we will use to experiment with some of Solr's facilities. Namely we'll be uploading json text and performing a quick query test. We'll then look at the schema and solrconfig files.\
+\
+\
+\pard\pardeftab720
+
+\b \cf3 \expnd0\expndtw0\kerning0
+IMPORTANT
+\b0 \expnd0\expndtw0\kerning0
+:\
+Note that we're going to start solr in a different mode than was in the previous document. If solr is currently running make sure to stop it.\
+\
+\pard\pardeftab720
+
+\f1 \cf3 \expnd0\expndtw0\kerning0
+bin\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+solr stop \cf5 \expnd0\expndtw0\kerning0
+-\cf3 \expnd0\expndtw0\kerning0
+all\
+\pard\pardeftab720
+
+\f0\b \cf3 \expnd0\expndtw0\kerning0
+WARNING
+\b0 \expnd0\expndtw0\kerning0
+:\
+\pard\pardeftab720
+\cf3 \expnd0\expndtw0\kerning0
+\ul \ulc3 The following only applies if you already have a booksdemo core\expnd0\expndtw0\kerning0
+\ulnone .\
+\
+If you've created a booksdemo core, then either change the name we'll be referencing, change the name of the current booksdemo core or delete the core:\
+\
+\pard\pardeftab720
+
+\f1 \cf3 \expnd0\expndtw0\kerning0
+bin\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+solr \cf6 \expnd0\expndtw0\kerning0
+delete\cf3 \expnd0\expndtw0\kerning0
+ \cf5 \expnd0\expndtw0\kerning0
+-\cf3 \expnd0\expndtw0\kerning0
+c booksdemo\
+bin\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+solr restart\
+\pard\pardeftab720
+
+\f0\b \cf3 \expnd0\expndtw0\kerning0
+Tutorial:
+\b0 \expnd0\expndtw0\kerning0
+\
+\
+We need to do a few things to ensure our solr core will be setup properly. Previously, if you followed the Koding setup guide you started Solr using the Solr cloud option. We will not be doing this. Instead, we will setup Solr in a very specific manner.\
+\
+First, make a booksdemo directory under solr/solr-5.3.0:\
+\
+\pard\pardeftab720
+
+\f1 \cf3 \expnd0\expndtw0\kerning0
+mkdir booksdemo\
+cd booksdemo\
+\pard\pardeftab720
+
+\f0 \cf3 \expnd0\expndtw0\kerning0
+Now add a solr directory:\
+\
+\pard\pardeftab720
+
+\f1 \cf3 \expnd0\expndtw0\kerning0
+mkdir solr\
+\pard\pardeftab720
+
+\f0 \cf3 \expnd0\expndtw0\kerning0
+\
+Next copy in the solr.xml and books.json:\
+\
+\pard\pardeftab720
+
+\f1 \cf3 \expnd0\expndtw0\kerning0
+cp \cf5 \expnd0\expndtw0\kerning0
+../\cf3 \expnd0\expndtw0\kerning0
+example\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+example\cf5 \expnd0\expndtw0\kerning0
+-\cf3 \expnd0\expndtw0\kerning0
+DIH\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+solr\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+solr\cf5 \expnd0\expndtw0\kerning0
+.\cf3 \expnd0\expndtw0\kerning0
+xml \cf5 \expnd0\expndtw0\kerning0
+./\cf3 \expnd0\expndtw0\kerning0
+solr\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+\
+cp \cf5 \expnd0\expndtw0\kerning0
+../\cf3 \expnd0\expndtw0\kerning0
+example\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+exampledocs\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+books\cf5 \expnd0\expndtw0\kerning0
+.\cf3 \expnd0\expndtw0\kerning0
+json \cf5 \expnd0\expndtw0\kerning0
+.\cf3 \expnd0\expndtw0\kerning0
+\
+\pard\pardeftab720
+
+\f0 \cf3 \expnd0\expndtw0\kerning0
+\
+Go up a previous directory and start solr:\
+\
+\pard\pardeftab720
+
+\f1 \cf3 \expnd0\expndtw0\kerning0
+cd \cf5 \expnd0\expndtw0\kerning0
+..\cf3 \expnd0\expndtw0\kerning0
+\
+bin\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+solr start \cf5 \expnd0\expndtw0\kerning0
+-\cf3 \expnd0\expndtw0\kerning0
+s booksdemo\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+solr\
+\pard\pardeftab720
+
+\f0 \cf3 \expnd0\expndtw0\kerning0
+Let's create a core. On your vm in the console box you'll want to type the following:\
+\
+\pard\pardeftab720
+
+\f1 \cf3 \expnd0\expndtw0\kerning0
+bin\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+solr create \cf5 \expnd0\expndtw0\kerning0
+-\cf3 \expnd0\expndtw0\kerning0
+c booksdemo\
+\pard\pardeftab720
+
+\f0 \cf3 \expnd0\expndtw0\kerning0
+\
+\
+You should see the following:\
+\
+\pard\pardeftab720
+
+\f1 \cf7 \expnd0\expndtw0\kerning0
+Setup\cf3 \expnd0\expndtw0\kerning0
+ \cf6 \expnd0\expndtw0\kerning0
+new\cf3 \expnd0\expndtw0\kerning0
+ core instance directory\cf5 \expnd0\expndtw0\kerning0
+:\cf3 \expnd0\expndtw0\kerning0
+\
+\pard\pardeftab720
+\cf5 \expnd0\expndtw0\kerning0
+.....\cf3 \expnd0\expndtw0\kerning0
+ \
+\pard\pardeftab720
+\cf7 \expnd0\expndtw0\kerning0
+Creating\cf3 \expnd0\expndtw0\kerning0
+ \cf6 \expnd0\expndtw0\kerning0
+new\cf3 \expnd0\expndtw0\kerning0
+ core \cf8 \expnd0\expndtw0\kerning0
+'booksdemo'\cf3 \expnd0\expndtw0\kerning0
+ \cf6 \expnd0\expndtw0\kerning0
+using\cf3 \expnd0\expndtw0\kerning0
+ command\cf5 \expnd0\expndtw0\kerning0
+:\cf3 \expnd0\expndtw0\kerning0
+\
+http\cf5 \expnd0\expndtw0\kerning0
+:\cf9 \expnd0\expndtw0\kerning0
+//localhost:8983/solr/admin/cores?action=CREATE&name=booksdemo&instanceDir=booksdemo\cf3 \expnd0\expndtw0\kerning0
+\
+ \
+\pard\pardeftab720
+\cf5 \expnd0\expndtw0\kerning0
+\{\cf3 \expnd0\expndtw0\kerning0
+\
+  \cf8 \expnd0\expndtw0\kerning0
+"responseHeader"\cf5 \expnd0\expndtw0\kerning0
+:\{\cf3 \expnd0\expndtw0\kerning0
+\
+    \cf8 \expnd0\expndtw0\kerning0
+"status"\cf5 \expnd0\expndtw0\kerning0
+:\cf10 \expnd0\expndtw0\kerning0
+0\cf5 \expnd0\expndtw0\kerning0
+,\cf3 \expnd0\expndtw0\kerning0
+\
+    \cf8 \expnd0\expndtw0\kerning0
+"QTime"\cf5 \expnd0\expndtw0\kerning0
+:\cf10 \expnd0\expndtw0\kerning0
+985\cf5 \expnd0\expndtw0\kerning0
+\},\cf3 \expnd0\expndtw0\kerning0
+\
+  \cf8 \expnd0\expndtw0\kerning0
+"core"\cf5 \expnd0\expndtw0\kerning0
+:\cf8 \expnd0\expndtw0\kerning0
+"booksdemo"\cf5 \expnd0\expndtw0\kerning0
+\}\cf3 \expnd0\expndtw0\kerning0
+\
+\pard\pardeftab720
+
+\f0 \cf3 \expnd0\expndtw0\kerning0
+\
+\
+Now copy over an example schema and solrconfig\
+\
+\pard\pardeftab720
+
+\f1 \cf3 \expnd0\expndtw0\kerning0
+cd booksdemo\
+cp \cf5 \expnd0\expndtw0\kerning0
+../\cf3 \expnd0\expndtw0\kerning0
+example\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+example\cf5 \expnd0\expndtw0\kerning0
+-\cf3 \expnd0\expndtw0\kerning0
+DIH\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+solr\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+solr\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+conf\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+solrconfig\cf5 \expnd0\expndtw0\kerning0
+.\cf3 \expnd0\expndtw0\kerning0
+xml \cf5 \expnd0\expndtw0\kerning0
+./\cf3 \expnd0\expndtw0\kerning0
+solr\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+booksdemo\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+conf\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+solrconfig\cf5 \expnd0\expndtw0\kerning0
+.\cf3 \expnd0\expndtw0\kerning0
+xml\
+cp \cf5 \expnd0\expndtw0\kerning0
+../\cf3 \expnd0\expndtw0\kerning0
+example\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+example\cf5 \expnd0\expndtw0\kerning0
+-\cf3 \expnd0\expndtw0\kerning0
+DIH\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+solr\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+solr\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+conf\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+schema\cf5 \expnd0\expndtw0\kerning0
+.\cf3 \expnd0\expndtw0\kerning0
+xml \cf5 \expnd0\expndtw0\kerning0
+./\cf3 \expnd0\expndtw0\kerning0
+solr\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+booksdemo\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+conf\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+schema\cf5 \expnd0\expndtw0\kerning0
+.\cf3 \expnd0\expndtw0\kerning0
+xml \
+\pard\pardeftab720
+
+\f0 \cf3 \expnd0\expndtw0\kerning0
+\
+\
+Now, open the ./solr/booksdemo/conf/schema.xml file and make a few changes. First, remove the Kurdish stop words factory on line 773 (just delete the line with StopFilterFactory).\
+\
+Next open the ./solr/booksdemo/conf/solrconfig.xml and remove lines 1159 through 1168. They should look like this:\
+\
+\pard\pardeftab720
+
+\f1 \cf9 \expnd0\expndtw0\kerning0
+<!-- REMOVE FROM HERE -->\cf3 \expnd0\expndtw0\kerning0
+\
+\pard\pardeftab720
+\cf11 \expnd0\expndtw0\kerning0
+<searchComponent\cf3 \expnd0\expndtw0\kerning0
+ \cf7 \expnd0\expndtw0\kerning0
+name\cf5 \expnd0\expndtw0\kerning0
+=\cf8 \expnd0\expndtw0\kerning0
+"suggest"\cf3 \expnd0\expndtw0\kerning0
+ \cf7 \expnd0\expndtw0\kerning0
+class\cf5 \expnd0\expndtw0\kerning0
+=\cf8 \expnd0\expndtw0\kerning0
+"solr.SuggestComponent"\cf11 \expnd0\expndtw0\kerning0
+>\cf3 \expnd0\expndtw0\kerning0
+\
+      \cf11 \expnd0\expndtw0\kerning0
+<lst\cf3 \expnd0\expndtw0\kerning0
+ \cf7 \expnd0\expndtw0\kerning0
+name\cf5 \expnd0\expndtw0\kerning0
+=\cf8 \expnd0\expndtw0\kerning0
+"suggester"\cf11 \expnd0\expndtw0\kerning0
+>\cf3 \expnd0\expndtw0\kerning0
+\
+        \cf11 \expnd0\expndtw0\kerning0
+<str\cf3 \expnd0\expndtw0\kerning0
+ \cf7 \expnd0\expndtw0\kerning0
+name\cf5 \expnd0\expndtw0\kerning0
+=\cf8 \expnd0\expndtw0\kerning0
+"name"\cf11 \expnd0\expndtw0\kerning0
+>\cf3 \expnd0\expndtw0\kerning0
+mySuggester\cf11 \expnd0\expndtw0\kerning0
+</str>\cf3 \expnd0\expndtw0\kerning0
+\
+        \cf11 \expnd0\expndtw0\kerning0
+<str\cf3 \expnd0\expndtw0\kerning0
+ \cf7 \expnd0\expndtw0\kerning0
+name\cf5 \expnd0\expndtw0\kerning0
+=\cf8 \expnd0\expndtw0\kerning0
+"lookupImpl"\cf11 \expnd0\expndtw0\kerning0
+>\cf3 \expnd0\expndtw0\kerning0
+FuzzyLookupFactory\cf11 \expnd0\expndtw0\kerning0
+</str>\cf3 \expnd0\expndtw0\kerning0
+      \cf9 \expnd0\expndtw0\kerning0
+<!-- org.apache.solr.spelling.suggest.fst -->\cf3 \expnd0\expndtw0\kerning0
+\
+        \cf11 \expnd0\expndtw0\kerning0
+<str\cf3 \expnd0\expndtw0\kerning0
+ \cf7 \expnd0\expndtw0\kerning0
+name\cf5 \expnd0\expndtw0\kerning0
+=\cf8 \expnd0\expndtw0\kerning0
+"dictionaryImpl"\cf11 \expnd0\expndtw0\kerning0
+>\cf3 \expnd0\expndtw0\kerning0
+DocumentDictionaryFactory\cf11 \expnd0\expndtw0\kerning0
+</str>\cf3 \expnd0\expndtw0\kerning0
+     \cf9 \expnd0\expndtw0\kerning0
+<!-- org.apache.solr.spelling.suggest.                   \
+      HighFrequencyDictionaryFactory -->\cf3 \expnd0\expndtw0\kerning0
+\
+        \cf11 \expnd0\expndtw0\kerning0
+<str\cf3 \expnd0\expndtw0\kerning0
+ \cf7 \expnd0\expndtw0\kerning0
+name\cf5 \expnd0\expndtw0\kerning0
+=\cf8 \expnd0\expndtw0\kerning0
+"field"\cf11 \expnd0\expndtw0\kerning0
+>\cf3 \expnd0\expndtw0\kerning0
+cat\cf11 \expnd0\expndtw0\kerning0
+</str>\cf3 \expnd0\expndtw0\kerning0
+\
+        \cf11 \expnd0\expndtw0\kerning0
+<str\cf3 \expnd0\expndtw0\kerning0
+ \cf7 \expnd0\expndtw0\kerning0
+name\cf5 \expnd0\expndtw0\kerning0
+=\cf8 \expnd0\expndtw0\kerning0
+"weightField"\cf11 \expnd0\expndtw0\kerning0
+>\cf3 \expnd0\expndtw0\kerning0
+price\cf11 \expnd0\expndtw0\kerning0
+</str>\cf3 \expnd0\expndtw0\kerning0
+\
+        \cf11 \expnd0\expndtw0\kerning0
+<str\cf3 \expnd0\expndtw0\kerning0
+ \cf7 \expnd0\expndtw0\kerning0
+name\cf5 \expnd0\expndtw0\kerning0
+=\cf8 \expnd0\expndtw0\kerning0
+"suggestAnalyzerFieldType"\cf11 \expnd0\expndtw0\kerning0
+>\cf3 \expnd0\expndtw0\kerning0
+string\cf11 \expnd0\expndtw0\kerning0
+</str>\cf3 \expnd0\expndtw0\kerning0
+\
+      \cf11 \expnd0\expndtw0\kerning0
+</lst>\cf3 \expnd0\expndtw0\kerning0
+\
+ \cf11 \expnd0\expndtw0\kerning0
+</searchComponent>\cf3 \expnd0\expndtw0\kerning0
+\
+\pard\pardeftab720
+\cf9 \expnd0\expndtw0\kerning0
+<!-- TO HERE -->\cf3 \expnd0\expndtw0\kerning0
+\
+\pard\pardeftab720
+
+\f0 \cf3 \expnd0\expndtw0\kerning0
+\
+Now restart your solr instance:\
+\
+\pard\pardeftab720
+
+\f1 \cf5 \expnd0\expndtw0\kerning0
+~\cf8 \expnd0\expndtw0\kerning0
+/solr/\cf3 \expnd0\expndtw0\kerning0
+solr\cf5 \expnd0\expndtw0\kerning0
+-\cf10 \expnd0\expndtw0\kerning0
+5.3\cf5 \expnd0\expndtw0\kerning0
+.\cf10 \expnd0\expndtw0\kerning0
+0\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+bin\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+solr stop \cf5 \expnd0\expndtw0\kerning0
+-\cf3 \expnd0\expndtw0\kerning0
+all   \
+\cf5 \expnd0\expndtw0\kerning0
+~\cf8 \expnd0\expndtw0\kerning0
+/solr/\cf3 \expnd0\expndtw0\kerning0
+solr\cf5 \expnd0\expndtw0\kerning0
+-\cf10 \expnd0\expndtw0\kerning0
+5.3\cf5 \expnd0\expndtw0\kerning0
+.\cf10 \expnd0\expndtw0\kerning0
+0\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+bin\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+solr start \cf5 \expnd0\expndtw0\kerning0
+-\cf3 \expnd0\expndtw0\kerning0
+s \cf5 \expnd0\expndtw0\kerning0
+~\cf8 \expnd0\expndtw0\kerning0
+/solr/\cf3 \expnd0\expndtw0\kerning0
+solr\cf5 \expnd0\expndtw0\kerning0
+-\cf10 \expnd0\expndtw0\kerning0
+5.3\cf5 \expnd0\expndtw0\kerning0
+.\cf10 \expnd0\expndtw0\kerning0
+0\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+booksdemo\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+solr\
+\pard\pardeftab720
+
+\f0 \cf3 \expnd0\expndtw0\kerning0
+\
+\
+From here we will be indexing some documents. Your Solr installation comes\
+with a few json documents and we already added books.json so we'll index that. \
+\
+\pard\pardeftab720
+
+\f1 \cf3 \expnd0\expndtw0\kerning0
+curl \cf8 \expnd0\expndtw0\kerning0
+'http://localhost:8983/solr/booksdemo/update/json?commit=true'\cf3 \expnd0\expndtw0\kerning0
+ \cf5 \expnd0\expndtw0\kerning0
+--\cf3 \expnd0\expndtw0\kerning0
+data\cf5 \expnd0\expndtw0\kerning0
+-\cf3 \expnd0\expndtw0\kerning0
+binary \cf10 \expnd0\expndtw0\kerning0
+@$\cf5 \expnd0\expndtw0\kerning0
+(\cf3 \expnd0\expndtw0\kerning0
+echo \cf5 \expnd0\expndtw0\kerning0
+~\cf8 \expnd0\expndtw0\kerning0
+/solr/\cf3 \expnd0\expndtw0\kerning0
+solr\cf5 \expnd0\expndtw0\kerning0
+-\cf10 \expnd0\expndtw0\kerning0
+5.3\cf5 \expnd0\expndtw0\kerning0
+.\cf10 \expnd0\expndtw0\kerning0
+0\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+booksdemo\cf5 \expnd0\expndtw0\kerning0
+/\cf3 \expnd0\expndtw0\kerning0
+books\cf5 \expnd0\expndtw0\kerning0
+.\cf3 \expnd0\expndtw0\kerning0
+json\cf5 \expnd0\expndtw0\kerning0
+)\cf3 \expnd0\expndtw0\kerning0
+ \cf5 \expnd0\expndtw0\kerning0
+-\cf3 \expnd0\expndtw0\kerning0
+H \cf8 \expnd0\expndtw0\kerning0
+'Content-type:application'\cf3 \expnd0\expndtw0\kerning0
+\
+\pard\pardeftab720
+
+\f0 \cf3 \expnd0\expndtw0\kerning0
+\
+\
+Now we have some content index you can either query the server from the\
+command line or use the solr admin.\
+\
+\pard\pardeftab720
+
+\f1 \cf3 \expnd0\expndtw0\kerning0
+curl \cf8 \expnd0\expndtw0\kerning0
+'http://localhost:8983/solr/booksdemo/select?q=*:*'\cf3 \expnd0\expndtw0\kerning0
+\
+\pard\pardeftab720
+
+\f0 \cf3 \expnd0\expndtw0\kerning0
+\
+You should see some results. You can also do:\
+\
+\pard\pardeftab720
+
+\f1 \cf3 \expnd0\expndtw0\kerning0
+curl \cf8 \expnd0\expndtw0\kerning0
+'http://localhost:8983/solr/booksdemo/select?q=the'\cf3 \expnd0\expndtw0\kerning0
+\
+\pard\pardeftab720
+
+\f0 \cf3 \expnd0\expndtw0\kerning0
+\
+And a book title with 'the' in it should show up. \
+\
+In fact, you can even see the topk terms:\
+\
+\pard\pardeftab720
+
+\f1 \cf3 \expnd0\expndtw0\kerning0
+curl \cf8 \expnd0\expndtw0\kerning0
+'http://localhost:8983/solr/booksdemo/terms?wt=json&indent=true&debugQuery=true&terms.fl=name&terms.sort=count'\cf3 \expnd0\expndtw0\kerning0
+\
+\pard\pardeftab720
+
+\f0 \cf3 \expnd0\expndtw0\kerning0
+\
+If you add 'the' to the stopwords.txt file in the conf directory performing the same query should no longer return any results (it's a good idea to reindex after changing the schema)! Note that the stopwords are still indexed. To stop this from happening read:\
+\
+\
+\pard\pardeftab720
+{\field{\*\fldinst{HYPERLINK "https://docs.lucidworks.com/display/lweug/Suppressing+Stop+Word+Indexing"}}{\fldrslt \cf4 \expnd0\expndtw0\kerning0
+https://docs.lucidworks.com/display/lweug/Suppressing+Stop+Word+Indexing}}\
+\
+Also note: reindexing the same file without modifications might not work. You may have to add a new term to a string, index, and remove this new term, and index again.\
+\
+Now, let's try to add some characters we would typically see in tweets.\
+\
+Open the books.json file and edit the name of a book to include #booksamiright? a few times throughout the file.\
+\
+Index the file again and check the term count.\
+\
+\
+Now, open schema.xml and search for the line that contains name="name" (it should be on line 126). This is where the type for the field is specified which means if you want to create your own custom field analyzer you'll need to change the type from text_general to something else. Go to line 440 to see how text_general is defined (e.g. search name="text_general" if you don't have a line count). When you create your own analyzer filter, you'll basically copy and paste this definition changing the name and adding in a different tokenizer and various filters.\
+\
+Read up more here:\
+\
+\pard\pardeftab720
+{\field{\*\fldinst{HYPERLINK "https://cwiki.apache.org/confluence/display/solr/Understanding+Analyzers,+Tokenizers,+and+Filters"}}{\fldrslt \cf4 \expnd0\expndtw0\kerning0
+https://cwiki.apache.org/confluence/display/solr/Understanding+Analyzers,+Tokenizers,+and+Filters}}\
+\
+\
+From here you can get started on your own twitter core. Note that instead of text_general there are specific field types for different languages, e.g. text_en for english, text_de for german. Each language also has its own stopword list in the lang directory within conf.\
+\
+Good luck!\
+}
